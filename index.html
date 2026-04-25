@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Vault</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons for premium minimalist icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* Design System / Tokens */
+        :root {
+            /* Dark Theme (Default) */
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-surface-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --danger: #ef4444;
+            --favorite: #ec4899;
+            --border: #334155;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.3);
+            --radius-md: 0.75rem;
+            --radius-lg: 1.25rem;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-base: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-surface-hover: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-glow: 0 0 15px rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        /* Header (Sticky Top Bar) */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: color-mix(in srgb, var(--bg-base) 85%, transparent);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .logo i {
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        /* Buttons */
+        button {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1.2rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--bg-surface-hover);
+            transform: translateY(-1px);
+        }
+
+        button.primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        button.primary:hover {
+            background: var(--primary-hover);
+            box-shadow: var(--shadow-glow);
+        }
+
+        button.icon-btn {
+            padding: 0.6rem;
+            border-radius: 50%;
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Input Form */
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--bg-surface);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        input,
+        select {
+            background: var(--bg-base);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .input-group input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 20%, transparent);
+        }
+
+        /* Controls Section */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-wrapper {
+            flex: 2;
+            min-width: 280px;
+            position: relative;
+        }
+
+        .search-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .search-wrapper input {
+            padding-left: 2.75rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 1rem;
+            flex: 3;
+            flex-wrap: wrap;
+        }
+
+        .filter-group select {
+            flex: 1;
+            min-width: 150px;
+            cursor: pointer;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Card Design */
+        .card {
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: grab;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card:active {
+            cursor: grabbing;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: color-mix(in srgb, var(--primary) 50%, var(--border));
+        }
+
+        .card.dragging {
+            opacity: 0.4;
+            transform: scale(0.95);
+            box-shadow: none;
+        }
+
+        .card-media {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: var(--bg-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-media img,
+        .card-media video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-media iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .card:hover .card-media img {
+            transform: scale(1.05);
+        }
+
+        .play-overlay i {
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        .card-media:hover .play-overlay i {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .platform-badge {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            padding: 0.35rem 0.6rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-content {
+            padding: 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            word-break: break-all;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: color 0.2s;
+            line-height: 1.4;
+        }
+
+        .card-title:hover {
+            color: var(--primary);
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+        }
+
+        .tag {
+            background: var(--bg-base);
+            color: var(--text-muted);
+            padding: 0.35rem 0.65rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-weight: 500;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .btn-icon-sm {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 50%;
+            transition: var(--transition);
+            font-size: 1.2rem;
+            display: grid;
+            place-items: center;
+        }
+
+        .btn-icon-sm:hover {
+            background: var(--bg-base);
+            color: var(--text-main);
+        }
+
+        .btn-icon-sm.favorite.active {
+            color: var(--favorite);
+        }
+
+        .btn-icon-sm.delete:hover {
+            color: var(--danger);
+            background: color-mix(in srgb, var(--danger) 10%, transparent);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 5rem 2rem;
+            color: var(--text-muted);
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 2px dashed var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--border);
+        }
+
+        .empty-state h3 {
+            color: var(--text-main);
+            font-size: 1.25rem;
+        }
+
+        /* Toasts */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 1000;
+        }
+
+        .toast {
+            background: var(--bg-surface);
+            color: var(--text-main);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            border-left: 4px solid var(--primary);
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.success i {
+            color: #10b981;
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.error i {
+            color: var(--danger);
+        }
+
+        .toast.info {
+            border-left-color: var(--primary);
+        }
+
+        .toast.info i {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 1rem;
+            }
+
+            .header-actions span {
+                display: none;
+            }
+
+            .input-group {
+                flex-direction: column;
+                padding: 1rem;
+            }
+
+            .input-group input,
+            .input-group button {
+                width: 100%;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-wrapper,
+            .filter-group select {
+                width: 100%;
+            }
+
+            main {
+                padding: 1rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .toast-container {
+                left: 1rem;
+                right: 1rem;
+                bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            <i class="ph-fill ph-vault"></i>
+            Media Vault
+        </div>
+        <div class="header-actions">
+            <button id="importBtn" title="Import JSON">
+                <i class="ph ph-upload-simple"></i>
+                <span>Import</span>
+            </button>
+            <input type="file" id="fileInput" accept=".json" style="display: none;">
+            <button id="exportBtn" title="Export JSON">
+                <i class="ph ph-download-simple"></i>
+                <span>Export</span>
+            </button>
+            <button id="themeToggle" class="icon-btn" title="Toggle Theme">
+                <i class="ph ph-sun"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <form class="input-group" id="addForm">
+            <input type="url" id="urlInput" placeholder="Paste video or link URL here..." required>
+            <input type="text" id="subcatInput" placeholder="Subcategory (e.g., Education, Coding)">
+            <button type="submit" class="primary">
+                <i class="ph ph-plus-circle"></i>
+                Save Link
+            </button>
+        </form>
+
+        <div class="controls">
+            <div class="search-wrapper">
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Search by URL, category, or platform...">
+            </div>
+
+            <div class="filter-group">
+                <select id="filterPlatform">
+                    <option value="all">All Platforms</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Direct Video">Direct Video</option>
+                    <option value="Other">Other Links</option>
+                </select>
+                <select id="filterFavorite">
+                    <option value="all">All Items</option>
+                    <option value="favorites">Favorites Only</option>
+                </select>
+                <select id="sortOption">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="favorites">Favorites First</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="grid" id="gallery">
+            <!-- Cards will be injected here -->
+        </div>
+    </main>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // --- State Management ---
+        let items = JSON.parse(localStorage.getItem('mediaVaultItems')) || [];
+        let theme = localStorage.getItem('mediaVaultTheme') || 'dark';
+
+        // --- DOM Elements ---
+        const addForm = document.getElementById('addForm');
+        const urlInput = document.getElementById('urlInput');
+        const subcatInput = document.getElementById('subcatInput');
+        const gallery = document.getElementById('gallery');
+        const searchInput = document.getElementById('searchInput');
+        const filterPlatform = document.getElementById('filterPlatform');
+        const filterFavorite = document.getElementById('filterFavorite');
+        const sortOption = document.getElementById('sortOption');
+        const toastContainer = document.getElementById('toastContainer');
+        const themeToggle = document.getElementById('themeToggle');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const fileInput = document.getElementById('fileInput');
+
+        // --- Initialization ---
+        function init() {
+            applyTheme(theme);
+            render();
+        }
+
+        // --- Utilities ---
+        function saveToStorage() {
+            localStorage.setItem('mediaVaultItems', JSON.stringify(items));
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = 'info';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'warning-circle';
+
+            toast.innerHTML = `<i class="ph-fill ph-${icon}"></i> ${message}`;
+            toastContainer.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                setTimeout(() => toast.classList.add('show'), 10);
+            });
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substring(2);
+        }
+
+        // --- Parsing Logic ---
+        function detectPlatform(url) {
+            url = url.toLowerCase();
+            if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube';
+            if (url.includes('instagram.com')) return 'Instagram';
+            if (url.match(/\.(mp4|webm|ogg)$/i)) return 'Direct Video';
+            return 'Other';
+        }
+
+        function getYouTubeId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // --- Event Listeners ---
+        addForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const url = urlInput.value.trim();
+            const subcat = subcatInput.value.trim() || 'Uncategorized';
+
+            if (!url) return;
+
+            if (items.some(item => item.url === url)) {
+                showToast('Link already exists in your vault!', 'error');
+                return;
+            }
+
+            const platform = detectPlatform(url);
+            const videoId = platform === 'YouTube' ? getYouTubeId(url) : null;
+
+            const newItem = {
+                id: generateId(),
+                url,
+                platform,
+                videoId,
+                category: subcat,
+                favorite: false,
+                timestamp: Date.now()
+            };
+
+            items.unshift(newItem);
+            saveToStorage();
+            render();
+            showToast('Saved successfully to Vault!', 'success');
+
+            urlInput.value = '';
+            subcatInput.value = '';
+        });
+
+        // Filters and Sort Events
+        searchInput.addEventListener('input', render);
+        filterPlatform.addEventListener('change', render);
+        filterFavorite.addEventListener('change', render);
+        sortOption.addEventListener('change', render);
+
+        // Actions inside Gallery (Event Delegation)
+        gallery.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+
+            const card = btn.closest('.card');
+            if (!card) return;
+            const id = card.dataset.id;
+
+            if (btn.classList.contains('favorite')) {
+                toggleFavorite(id);
+            } else if (btn.classList.contains('delete')) {
+                deleteItem(id);
+            }
+        });
+
+        // Drag and Drop Logic
+        let draggedItem = null;
+
+        gallery.addEventListener('dragstart', (e) => {
+            const card = e.target.closest('.card');
+            if (!card) return;
+            draggedItem = card;
+            setTimeout(() => card.classList.add('dragging'), 0);
+        });
+
+        gallery.addEventListener('dragend', (e) => {
+            const card = e.target.closest('.card');
+            if (card) card.classList.remove('dragging');
+            draggedItem = null;
+        });
+
+        gallery.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            if (!draggedItem) return;
+
+            const afterElement = getDragAfterElement(gallery, e.clientY, e.clientX);
+            if (afterElement == null) {
+                gallery.appendChild(draggedItem);
+            } else {
+                gallery.insertBefore(draggedItem, afterElement);
+            }
+        });
+
+        gallery.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const cardElements = [...gallery.querySelectorAll('.card')];
+
+            // Rebuild items array based on new DOM order
+            const reorderedItems = [];
+            cardElements.forEach(card => {
+                const item = items.find(i => i.id === card.dataset.id);
+                if (item) reorderedItems.push(item);
+            });
+
+            if (reorderedItems.length === items.length) {
+                items = reorderedItems;
+                saveToStorage();
+            }
+        });
+
+        function getDragAfterElement(container, y, x) {
+            const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
+
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const boxCenterY = box.top + box.height / 2;
+                const boxCenterX = box.left + box.width / 2;
+
+                const offset = Math.sqrt(Math.pow(y - boxCenterY, 2) + Math.pow(x - boxCenterX, 2));
+
+                if (y < boxCenterY && offset < closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return closest;
+                }
+            }, { offset: Number.POSITIVE_INFINITY }).element;
+        }
+
+        // --- Action Functions ---
+        function toggleFavorite(id) {
+            const item = items.find(i => i.id === id);
+            if (item) {
+                item.favorite = !item.favorite;
+                saveToStorage();
+                render();
+                if (item.favorite) showToast('Added to favorites!', 'success');
+            }
+        }
+
+        function deleteItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                items = items.filter(i => i.id !== id);
+                saveToStorage();
+                render();
+                showToast('Item deleted', 'info');
+            }
+        }
+
+        // --- Theme Management ---
+        function applyTheme(newTheme) {
+            document.documentElement.setAttribute('data-theme', newTheme);
+            themeToggle.innerHTML = newTheme === 'dark' ? '<i class="ph ph-sun"></i>' : '<i class="ph ph-moon"></i>';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            theme = theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('mediaVaultTheme', theme);
+            applyTheme(theme);
+        });
+
+        // --- Export / Import ---
+        exportBtn.addEventListener('click', () => {
+            if (items.length === 0) {
+                showToast('Nothing to export!', 'error');
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(items, null, 2));
+            const downloadNode = document.createElement('a');
+            downloadNode.setAttribute("href", dataStr);
+            downloadNode.setAttribute("download", `media_vault_backup_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(downloadNode);
+            downloadNode.click();
+            downloadNode.remove();
+            showToast('Vault exported successfully!', 'success');
+        });
+
+        importBtn.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const importedItems = JSON.parse(event.target.result);
+                    if (Array.isArray(importedItems)) {
+                        let added = 0;
+                        importedItems.forEach(importItem => {
+                            if (!items.some(existing => existing.url === importItem.url)) {
+                                if (!importItem.id) importItem.id = generateId();
+                                items.push(importItem);
+                                added++;
+                            }
+                        });
+
+                        if (added > 0) {
+                            saveToStorage();
+                            render();
+                            showToast(`Imported ${added} new items!`, 'success');
+                        } else {
+                            showToast('No new items to import.', 'info');
+                        }
+                    } else {
+                        throw new Error("Not an array");
+                    }
+                } catch (err) {
+                    showToast('Invalid JSON backup file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+            fileInput.value = '';
+        });
+
+        // --- Render Logic ---
+        function render() {
+            let filteredItems = [...items];
+
+            // Apply Search
+            const search = searchInput.value.toLowerCase().trim();
+            if (search) {
+                filteredItems = filteredItems.filter(item =>
+                    item.url.toLowerCase().includes(search) ||
+                    item.category.toLowerCase().includes(search) ||
+                    item.platform.toLowerCase().includes(search)
+                );
+            }
+
+            // Apply Platform Filter
+            const platform = filterPlatform.value;
+            if (platform !== 'all') {
+                filteredItems = filteredItems.filter(item => item.platform === platform);
+            }
+
+            // Apply Favorite Filter
+            const fav = filterFavorite.value;
+            if (fav === 'favorites') {
+                filteredItems = filteredItems.filter(item => item.favorite);
+            }
+
+            // Apply Sorting
+            const sort = sortOption.value;
+            if (sort === 'newest') {
+                filteredItems.sort((a, b) => b.timestamp - a.timestamp);
+            } else if (sort === 'oldest') {
+                filteredItems.sort((a, b) => a.timestamp - b.timestamp);
+            } else if (sort === 'favorites') {
+                filteredItems.sort((a, b) => {
+                    if (b.favorite === a.favorite) return b.timestamp - a.timestamp;
+                    return b.favorite ? -1 : 1;
+                });
+            }
+
+            gallery.innerHTML = '';
+
+            if (filteredItems.length === 0) {
+                gallery.innerHTML = `
+                    <div class="empty-state">
+                        <i class="ph ph-folder-open"></i>
+                        <h3>Your vault is empty</h3>
+                        <p>Save links, videos, and inspiration to see them here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.id = item.id;
+                card.draggable = true;
+
+                let mediaHtml = '';
+
+                // Generate Media Preview
+                if (item.platform === 'YouTube' && item.videoId) {
+                    mediaHtml = `
+                        <div class="card-media" style="cursor: pointer;" onclick="this.innerHTML='<iframe src=\\'https://www.youtube.com/embed/${item.videoId}?autoplay=1\\' allowfullscreen></iframe>'">
+                            <img src="https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg" alt="YouTube Thumbnail">
+                            <div class="play-overlay" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3);">
+                                <i class="ph-fill ph-play-circle" style="font-size: 4rem; color: white;"></i>
+                            </div>
+                        </div>
+                    `;
+                } else if (item.platform === 'Direct Video') {
+                    mediaHtml = `
+                        <div class="card-media">
+                            <video src="${item.url}" controls></video>
+                        </div>
+                    `;
+                } else if (item.platform === 'Instagram') {
+                    mediaHtml = `
+                        <div class="card-media" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);">
+                            <i class="ph ph-instagram-logo" style="font-size: 4rem; color: white;"></i>
+                        </div>
+                    `;
+                } else {
+                    mediaHtml = `
+                        <div class="card-media" style="display: flex; align-items: center; justify-content: center; background: var(--bg-surface-hover);">
+                            <i class="ph ph-link" style="font-size: 4rem; color: var(--text-muted);"></i>
+                        </div>
+                    `;
+                }
+
+                // Platform Icon
+                let platformIcon = 'link';
+                if (item.platform === 'YouTube') platformIcon = 'youtube-logo';
+                if (item.platform === 'Instagram') platformIcon = 'instagram-logo';
+                if (item.platform === 'Direct Video') platformIcon = 'video';
+
+                // Favorite State
+                const favClass = item.favorite ? 'ph-fill ph-heart active' : 'ph ph-heart';
+
+                card.innerHTML = `
+                    <div class="platform-badge">
+                        <i class="ph ph-${platformIcon}"></i> ${item.platform}
+                    </div>
+                    ${mediaHtml}
+                    <div class="card-content">
+                        <a href="${item.url}" target="_blank" class="card-title" title="${item.url}">
+                            ${item.platform === 'YouTube' && item.videoId ? 'Watch on YouTube' : item.url}
+                        </a>
+                        <div class="card-meta">
+                            <span class="tag"><i class="ph ph-folder"></i> ${item.category}</span>
+                            <div class="card-actions">
+                                <button class="btn-icon-sm favorite" title="Toggle Favorite">
+                                    <i class="${favClass}"></i>
+                                </button>
+                                <button class="btn-icon-sm delete" title="Delete from Vault">
+                                    <i class="ph ph-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                gallery.appendChild(card);
+            });
+        }
+
+        // --- Boot up ---
+        init();
+    </script>
+</body>
+
+</html>
