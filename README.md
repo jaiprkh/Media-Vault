@@ -40,4 +40,4 @@ Media Vault is a lightweight web application that allows you to save, organize, 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/media-vault.git
+   git clone https://github.com/jaiprkh/media-vault.git
